@@ -130,19 +130,19 @@ class TradeConcurrencyTest {
     @WithMockUser(username = "testuser")
     void shouldSerializeWrites() throws Exception {
         // Given
+        ExecutorService executor = Executors.newFixedThreadPool(2);
         CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch writer1Started = new CountDownLatch(1);
-        CountDownLatch writer2Completed = new CountDownLatch(1);
 
         List<Trade> results = new CopyOnWriteArrayList<>();
         List<Exception> exceptions = new CopyOnWriteArrayList<>();
 
-        // When - Start two writers
-        Thread writer1 = new Thread(() -> {
+        // When - Start two writers using executor service
+        Future<?> future1 = executor.submit(() -> {
             try {
                 startLatch.await(); // Wait for signal to start
-                Trade trade = TradeTestBuilder.aTrade().build();
                 writer1Started.countDown(); // Signal that we started
+                Trade trade = TradeTestBuilder.aTrade().build();
                 Trade saved = tradeService.recordTrade(trade);
                 results.add(saved);
             } catch (Exception e) {
@@ -150,27 +150,24 @@ class TradeConcurrencyTest {
             }
         });
 
-        Thread writer2 = new Thread(() -> {
+        Future<?> future2 = executor.submit(() -> {
             try {
                 writer1Started.await(); // Wait for writer1 to start
                 Trade trade = TradeTestBuilder.aTrade().build();
                 Trade saved = tradeService.recordTrade(trade);
                 results.add(saved);
-                writer2Completed.countDown();
             } catch (Exception e) {
                 exceptions.add(e);
-                writer2Completed.countDown();
             }
         });
 
-        writer1.start();
-        writer2.start();
         startLatch.countDown(); // Start both writers
 
         // Then - Both should complete successfully (writes serialized)
-        boolean completed = writer2Completed.await(15, TimeUnit.SECONDS);
+        future1.get(15, TimeUnit.SECONDS);
+        future2.get(15, TimeUnit.SECONDS);
+        executor.shutdown();
 
-        assertThat(completed).isTrue();
         assertThat(exceptions).isEmpty();
         assertThat(results).hasSize(2);
 

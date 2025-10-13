@@ -115,7 +115,7 @@ public class TradeService {
 
     @Transactional(readOnly = true)
     public List<TradeAudit> getAuditHistory(Long tradeId) {
-        return auditRepository.findByTradeIdOrderByAuditTimestampDesc(tradeId);
+        return auditRepository.findByTradeIdOrderByAuditTimestampDescIdDesc(tradeId);
     }
 
     private void auditTrade(Trade trade, AuditAction action, Trade before, Trade after) {

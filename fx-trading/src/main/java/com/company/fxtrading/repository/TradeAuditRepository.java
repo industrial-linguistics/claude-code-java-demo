@@ -10,8 +10,8 @@ import java.util.List;
 @Repository
 public interface TradeAuditRepository extends JpaRepository<TradeAudit, Long> {
 
-    List<TradeAudit> findByTradeIdOrderByAuditTimestampDesc(Long tradeId);
+    List<TradeAudit> findByTradeIdOrderByAuditTimestampDescIdDesc(Long tradeId);
 
-    List<TradeAudit> findByAuditTimestampBetweenOrderByAuditTimestampDesc(
+    List<TradeAudit> findByAuditTimestampBetweenOrderByAuditTimestampDescIdDesc(
             LocalDateTime start, LocalDateTime end);
 }
