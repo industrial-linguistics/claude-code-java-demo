@@ -33,6 +33,10 @@ logs/
 # PID files
 *.pid
 
+# Node/NPM (for Puppeteer tests)
+node_modules/
+package-lock.json
+
 # OS
 .DS_Store
 Thumbs.db
