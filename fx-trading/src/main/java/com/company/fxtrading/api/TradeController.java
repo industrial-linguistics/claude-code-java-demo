@@ -4,6 +4,7 @@ import com.company.fxtrading.domain.Trade;
 import com.company.fxtrading.domain.TradeAudit;
 import com.company.fxtrading.domain.TradeStatus;
 import com.company.fxtrading.service.TradeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class TradeController {
     private final TradeService tradeService;
 
     @PostMapping
-    public ResponseEntity<Trade> createTrade(@RequestBody Trade trade) {
+    public ResponseEntity<Trade> createTrade(@Valid @RequestBody Trade trade) {
         Trade created = tradeService.recordTrade(trade);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
