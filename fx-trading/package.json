@@ -1,0 +1,29 @@
+{
+  "name": "fx-trading",
+  "version": "1.0.0",
+  "description": "A lightweight Foreign Exchange spot trade recording system built with Spring Boot and SQLite.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:ui": "jest test/e2e/trade-ui.test.js",
+    "test:simple": "node test/e2e/simple-test.js",
+    "test:create-100": "jest test/e2e/create-trade-100.test.js",
+    "test:watch": "jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 30000,
+    "verbose": true
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "puppeteer": "^24.24.0"
+  }
+}

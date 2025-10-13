@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <!-- Convert timestamp columns from epoch milliseconds to ISO-8601 format -->
+    <changeSet id="003-fix-timestamp-format-trades" author="system">
+        <!-- Create temporary columns with new format -->
+        <addColumn tableName="trades">
+            <column name="created_at_new" type="TEXT"/>
+            <column name="updated_at_new" type="TEXT"/>
+        </addColumn>
+
+        <!-- Convert epoch milliseconds to ISO-8601 format -->
+        <!-- SQLite datetime function expects seconds, so divide by 1000 -->
+        <sql>
+            UPDATE trades
+            SET created_at_new = datetime(created_at / 1000, 'unixepoch'),
+                updated_at_new = datetime(updated_at / 1000, 'unixepoch')
+            WHERE typeof(created_at) = 'integer' OR typeof(created_at) = 'real';
+        </sql>
+
+        <!-- Drop old columns -->
+        <dropColumn tableName="trades" columnName="created_at"/>
+        <dropColumn tableName="trades" columnName="updated_at"/>
+
+        <!-- Rename new columns to original names -->
+        <renameColumn tableName="trades"
+                      oldColumnName="created_at_new"
+                      newColumnName="created_at"
+                      columnDataType="TEXT"/>
+        <renameColumn tableName="trades"
+                      oldColumnName="updated_at_new"
+                      newColumnName="updated_at"
+                      columnDataType="TEXT"/>
+    </changeSet>
+
+    <!-- Same for trade_audit table -->
+    <changeSet id="003-fix-timestamp-format-trade-audit" author="system">
+        <addColumn tableName="trade_audit">
+            <column name="audit_timestamp_new" type="TEXT"/>
+        </addColumn>
+
+        <sql>
+            UPDATE trade_audit
+            SET audit_timestamp_new = datetime(audit_timestamp / 1000, 'unixepoch')
+            WHERE typeof(audit_timestamp) = 'integer' OR typeof(audit_timestamp) = 'real';
+        </sql>
+
+        <dropColumn tableName="trade_audit" columnName="audit_timestamp"/>
+
+        <renameColumn tableName="trade_audit"
+                      oldColumnName="audit_timestamp_new"
+                      newColumnName="audit_timestamp"
+                      columnDataType="TEXT"/>
+    </changeSet>
+
+    <!-- Same for users table -->
+    <changeSet id="003-fix-timestamp-format-users" author="system">
+        <addColumn tableName="users">
+            <column name="created_at_new" type="TEXT"/>
+        </addColumn>
+
+        <sql>
+            UPDATE users
+            SET created_at_new = datetime(created_at / 1000, 'unixepoch')
+            WHERE typeof(created_at) = 'integer' OR typeof(created_at) = 'real';
+        </sql>
+
+        <dropColumn tableName="users" columnName="created_at"/>
+
+        <renameColumn tableName="users"
+                      oldColumnName="created_at_new"
+                      newColumnName="created_at"
+                      columnDataType="TEXT"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -16,7 +16,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())
