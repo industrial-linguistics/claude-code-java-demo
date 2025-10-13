@@ -1,0 +1,57 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: fx-trading-system
+
+  datasource:
+    url: jdbc:sqlite:${FX_DB_PATH:./data/trades.db}?journal_mode=WAL&synchronous=NORMAL&foreign_keys=ON
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      maximum-pool-size: 1
+      connection-timeout: 30000
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  security:
+    user:
+      name: admin
+      password: ${ADMIN_PASSWORD:changeme}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    root: INFO
+    com.company.fxtrading: DEBUG
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+fx-trading:
+  validation:
+    max-trade-amount: 10000000
+    allowed-currencies: EUR,USD,GBP,JPY,CHF,AUD,CAD,NZD,SEK,NOK,DKK

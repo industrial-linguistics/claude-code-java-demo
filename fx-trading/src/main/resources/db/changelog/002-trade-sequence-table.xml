@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="002-create-trade-sequence-table" author="system">
+        <comment>
+            Create trade_sequence table for atomic trade reference generation.
+            This table eliminates the race condition in generateTradeReference() by
+            using database-level locking instead of in-memory synchronization.
+        </comment>
+
+        <createTable tableName="trade_sequence">
+            <column name="trade_date" type="DATE">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="next_sequence" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="trade_sequence"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
